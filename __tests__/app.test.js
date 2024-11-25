@@ -3,7 +3,8 @@ const request = require("supertest")
 const app = require("../db/app")
 const db = require("../db/connection")
 const seed = require("../db/seeds/seed")
-const data = require("../db/data/test-data")
+const data = require("../db/data/test-data/index")
+
 
 afterAll(() => {
   return db.end()
@@ -23,3 +24,14 @@ describe("GET /api", () => {
       });
   });
 });
+
+describe("GET /api/topics", () => {
+  test("200: Responds with an object of all the topics", () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.topics).toEqual(data.topicData);
+      });
+  });
+})
