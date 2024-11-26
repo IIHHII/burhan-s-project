@@ -4,6 +4,7 @@ const app = require("../db/app")
 const db = require("../db/connection")
 const seed = require("../db/seeds/seed")
 const data = require("../db/data/test-data/index")
+require("jest-sorted");
 
 
 afterAll(() => {
@@ -61,13 +62,68 @@ describe("GET /api/articles/:article_id", () => {
   });
   test('GET:404 sends an appropriate status and error meaasge when given a valid bot non-existent id', () => {
     return request(app)
-    .get('/api/articles/123')
-    .expect(404)
-    .then((response) => {
-      expect(response.body.msg).toBe('article does not exist');
-    })
+      .get('/api/articles/123')
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('article does not exist');
+      })
   })
 });
+
+describe("GET /api/articles", () => {
+  test("200: Responds with an object of all the articles", () => {
+    return request(app)
+    .get('/api/articles')
+    .expect(200)
+    .then(({ body }) => {
+      expect(body.articles).toHaveLength(13);
+      body.articles.forEach(({ article_id, title, topic, author, created_at, votes, article_img_url, comment_count}) => {
+        expect(typeof article_id).toBe("number")
+        expect(typeof title).toBe("string")
+        expect(typeof topic).toBe("string")
+        expect(typeof author).toBe("string")
+        expect(typeof created_at).toBe("string")
+        expect(typeof votes).toBe("number")
+        expect(typeof article_img_url).toBe("string")
+        expect(typeof comment_count).toBe("string")
+      })
+      expect(body.articles).toBeSortedBy('created_at', { descending: true });
+    })
+  })
+  test('404: Responds with an error when the route is invalid', () => {
+    return request(app)
+      .get('/api/invalid-route')
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('Route not found');
+      });
+  });
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // test('should return 500 with generic error message when an unexpected error occurs', () => {
 //   app.get('/error-test', (req, res, next) => {

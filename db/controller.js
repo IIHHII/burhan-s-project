@@ -1,6 +1,5 @@
 const endpoints = require('../endpoints.json');
-const { fetchTopics, fetchArticle } = require('./model')
-const db = require("./connection");
+const { fetchTopics, fetchArticle, fetchArticles } = require('./model')
 
 exports.apiHealthCheck = (req, res) => {
     res.status(200).send({ endpoints })
@@ -22,7 +21,13 @@ exports.getArticleById = (req, res, next) => {
         .then((article) => {
             res.status(200).send({ article })
         })
-        .catch((err) => {
-            next(err)
-        })
+        .catch(next)
+}
+
+exports.getArticles = (req, res, next) => {
+    fetchArticles()
+    .then((articles) => {
+        res.status(200).send({ articles })
+    })
+    .catch(next)
 }
