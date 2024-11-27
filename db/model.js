@@ -10,7 +10,7 @@ function fetchTopics() {
 function fetchArticle(article_id) {
     return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
         .then(({ rows }) => {
-            if(rows.length === 0) {
+            if (rows.length === 0) {
                 return Promise.reject({ status: 404, msg: 'article does not exist' });
             }
             return rows;
@@ -28,19 +28,29 @@ function fetchArticles() {
       GROUP BY articles.article_id
       ORDER BY articles.created_at DESC;
       `)
-    .then(({ rows }) => {
-        return rows
-    })
+        .then(({ rows }) => {
+            return rows
+        })
 }
 
 function fetchArticleComments(article_id) {
     return db.query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`, [article_id])
         .then(({ rows }) => {
-            if(rows.length === 0) {
-                return Promise.reject({ status: 404, msg: 'article does not exist' });
+            if (rows.length === 0) {
+                return Promise.reject({ status: 404, msg:'article does not exist' });
             }
             return rows;
         })
 }
 
-module.exports = { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments }
+function insertComment(article_id, username, body ) {
+    return db.query(
+        `INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`,
+        [article_id, username, body]
+    )
+        .then(({rows}) => {
+            return rows[0];
+        });
+}
+
+module.exports = { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments, insertComment }
