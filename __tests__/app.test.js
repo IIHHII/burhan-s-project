@@ -68,6 +68,14 @@ describe("GET /api/articles/:article_id", () => {
         expect(response.body.msg).toBe('article does not exist');
       })
   })
+  test('404: Responds with an error when the route is invalid', () => {
+    return request(app)
+      .get('/api/invalid-route')
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('Route not found');
+      });
+  });
 });
 
 describe("GET /api/articles", () => {
@@ -85,7 +93,7 @@ describe("GET /api/articles", () => {
         expect(typeof created_at).toBe("string")
         expect(typeof votes).toBe("number")
         expect(typeof article_img_url).toBe("string")
-        expect(typeof comment_count).toBe("string")
+        expect(typeof comment_count).toBe("number")
       })
       expect(body.articles).toBeSortedBy('created_at', { descending: true });
     })
@@ -100,40 +108,39 @@ describe("GET /api/articles", () => {
   });
 })
 
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: responds with object of all comments in order from the correct article", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articleComments).toHaveLength(11);
+        body.articleComments.forEach(({ comment_id, body, votes, author, article_id, created_at }) => {
+          expect(typeof comment_id).toBe("number")
+          expect(typeof body).toBe("string")
+          expect(typeof votes).toBe("number")
+          expect(typeof author).toBe("string")
+          expect(typeof article_id).toBe("number")
+          expect(typeof created_at).toBe("string")
+        })
+        expect(body.articleComments).toBeSortedBy('created_at', { descending: true });
+      });
+  });
+  test('GET:404 sends an appropriate status and error meaasge when given a valid bot non-existent id', () => {
+    return request(app)
+      .get('/api/articles/123/comments')
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('article does not exist');
+      })
+  })
+  test('404: Responds with an error when the route is invalid', () => {
+    return request(app)
+      .get('/api/invalid-route')
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('Route not found');
+      });
+  });
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// test('should return 500 with generic error message when an unexpected error occurs', () => {
-//   app.get('/error-test', (req, res, next) => {
-//     next(new Error('Unexpected error!'));
-//     console.log('1')
-//   });
-//   return request(app)
-//     .get('/error-test')
-//     .expect(500)
-//     .then(({ body }) => {
-//       expect(body.msg).toBe('Internal Server Error');
-//     });
-// });
