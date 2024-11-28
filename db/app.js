@@ -7,7 +7,8 @@ const {
     getArticleById,
     getArticles,
     getArticleComments,
-    postComment } = require("./controller")
+    postComment, 
+    patchArticle } = require("./controller")
 app.get('/api', apiHealthCheck)
 
 app.get('/api/topics', getTopics)
@@ -20,6 +21,8 @@ app.get('/api/articles/:article_id/comments', getArticleComments)
 
 app.post('/api/articles/:article_id/comments', postComment)
 
+app.patch('/api/articles/:article_id', patchArticle)
+
 app.all('*', (req, res, next) => {
     res.status(404).send({ msg: 'Route not found' });
 });
@@ -31,8 +34,5 @@ app.use((err, req, res, next) => {
         res.status(500).send({ msg: 'Internal Server Error' });
     }
 })
-
-
-
 
 module.exports = app

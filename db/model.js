@@ -8,7 +8,8 @@ function fetchTopics() {
 }
 
 function fetchArticle(article_id) {
-    return db.query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+    return db.query(`SELECT * FROM articles 
+        WHERE article_id = $1`, [article_id])
         .then(({ rows }) => {
             if (rows.length === 0) {
                 return Promise.reject({ status: 404, msg: 'article does not exist' });
@@ -34,23 +35,39 @@ function fetchArticles() {
 }
 
 function fetchArticleComments(article_id) {
-    return db.query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`, [article_id])
+    return db.query(`SELECT * FROM comments
+         WHERE article_id = $1 
+         ORDER BY created_at DESC`, [article_id])
         .then(({ rows }) => {
             if (rows.length === 0) {
-                return Promise.reject({ status: 404, msg:'article does not exist' });
+                return Promise.reject({ status: 404, msg: 'article does not exist' });
             }
             return rows;
         })
 }
 
-function insertComment(article_id, username, body ) {
+function insertComment(article_id, username, body) {
     return db.query(
-        `INSERT INTO comments (article_id, author, body) VALUES ($1, $2, $3) RETURNING *;`,
+        `INSERT INTO comments (article_id, author, body) 
+        VALUES ($1, $2, $3) RETURNING *;`,
         [article_id, username, body]
     )
-        .then(({rows}) => {
+        .then(({ rows }) => {
             return rows[0];
         });
 }
 
-module.exports = { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments, insertComment }
+function updateArticleVotes(article_id, inc_votes) {
+    return db.query(
+        `UPDATE articles
+       SET votes = votes + $1
+       WHERE article_id = $2
+       RETURNING *;`,
+        [inc_votes, article_id]
+    )
+        .then(({ rows }) => {
+            return rows[0];
+        });
+}
+
+module.exports = { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments, insertComment, updateArticleVotes }

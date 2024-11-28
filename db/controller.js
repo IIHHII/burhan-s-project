@@ -1,5 +1,5 @@
 const endpoints = require('../endpoints.json');
-const { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments, insertComment } = require('./model')
+const { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments, insertComment, updateArticleVotes } = require('./model')
 
 exports.apiHealthCheck = (req, res) => {
     res.status(200).send({ endpoints })
@@ -55,4 +55,21 @@ exports.postComment = (req, res, next) => {
         next(err);
       });
       
+}
+
+exports.patchArticle = (req, res, next) => {
+    const { article_id } = req.params;
+    const { inc_votes } = req.body;
+
+    if (!inc_votes) {
+        return res.status(400).send({ msg: 'Bad request' });
+      }
+
+    updateArticleVotes(article_id, inc_votes)
+    .then((updatedVotes) => {
+        if(!updatedVotes){
+            return res.status(400).send({ msg: "Bad request" });
+        }
+        res.status(200).send({ article : updatedVotes });
+    })
 }

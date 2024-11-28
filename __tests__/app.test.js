@@ -182,16 +182,44 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
+describe('PATCH /api/articles/:article_id', () => {
+  test('200: responds with the updated article when votes are incremented', () => {
+    return request(app)
+      .patch('/api/articles/1')
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject({
+          article_id: 1,
+          votes: expect.any(Number),
+        });
+        expect(body.article.votes).toBe(101);
+      });
+  });
 
+  test('200: responds with the updated article when votes are decremented', () => {
+    return request(app)
+      .patch('/api/articles/1')
+      .send({ inc_votes: -1000 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject({
+          article_id: 1,
+          votes: expect.any(Number),
+        });
+        expect(body.article.votes).toBe(-900);
+      });
+  });
 
-
-
-
-
-
-
-
-
-
+  test('400: responds with bad request when inc_votes is missing', () => {
+    return request(app)
+      .patch('/api/articles/1')
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad request');
+      });
+  });
+});
 
 
