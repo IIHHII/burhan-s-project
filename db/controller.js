@@ -1,5 +1,5 @@
 const endpoints = require('../endpoints.json');
-const { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments, insertComment, updateArticleVotes } = require('./model')
+const { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments, insertComment, updateArticleVotes, removeComment } = require('./model')
 
 exports.apiHealthCheck = (req, res) => {
     res.status(200).send({ endpoints })
@@ -46,15 +46,15 @@ exports.postComment = (req, res, next) => {
     const { username, body } = req.body;
     if (!username || !body) {
         return res.status(400).send({ msg: "Bad request" });
-      }
+    }
     insertComment(article_id, username, body).then((comment) => {
         res.status(201).send({ comment });
     })
-    .catch((err) => {
-        console.log(err);
-        next(err);
-      });
-      
+        .catch((err) => {
+            console.log(err);
+            next(err);
+        });
+
 }
 
 exports.patchArticle = (req, res, next) => {
@@ -63,13 +63,24 @@ exports.patchArticle = (req, res, next) => {
 
     if (!inc_votes) {
         return res.status(400).send({ msg: 'Bad request' });
-      }
+    }
 
     updateArticleVotes(article_id, inc_votes)
-    .then((updatedVotes) => {
-        if(!updatedVotes){
-            return res.status(400).send({ msg: "Bad request" });
-        }
-        res.status(200).send({ article : updatedVotes });
-    })
+        .then((updatedVotes) => {
+            if (!updatedVotes) {
+                return res.status(400).send({ msg: "Bad request" });
+            }
+            res.status(200).send({ article: updatedVotes });
+        })
+}
+
+exports.deleteComment = (req, res, next) => {
+    const { comment_id } = req.params;
+    removeComment(comment_id)
+        .then((result) => {
+            if (result.rowCount === 0) {
+                return res.status(404).send({ msg: 'Comment not found' });
+            }
+            res.status(204).send();
+        });
 }

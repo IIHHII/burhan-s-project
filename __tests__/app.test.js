@@ -131,7 +131,7 @@ describe("GET /api/articles/:article_id/comments", () => {
   //     .get("/api/articles/1/comments")
   //     .expect(200)
   //     .then(({ body }) => {
-        
+
   //     });
   // });
   test('404: sends an appropriate status and error meaasge when given a valid bot non-existent id', () => {
@@ -163,7 +163,6 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(newComment)
       .expect(201)
       .then(({ body }) => {
-        console.log(body)
         expect(body.comment.author).toBe("butter_bridge");
         expect(body.comment.body).toBe("This is a test comment");
         expect(body.comment.article_id).toBe(1);
@@ -222,4 +221,16 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 });
 
-
+describe('DELETE: /api/comments/:comment_id', () => {
+  test('DELETE:204 deletes the specified comment and sends no body back', () => {
+    return request(app).delete('/api/comments/3').expect(204);
+  });
+  test('404: responds with an appropriate error for non-existent comment ID', () => {
+    return request(app)
+      .delete('/api/comments/9999')
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Comment not found');
+      });
+  });
+});

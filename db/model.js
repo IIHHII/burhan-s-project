@@ -70,4 +70,8 @@ function updateArticleVotes(article_id, inc_votes) {
         });
 }
 
-module.exports = { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments, insertComment, updateArticleVotes }
+function removeComment(comment_id) {
+    return db.query('DELETE FROM comments WHERE comment_id = $1;', [comment_id]);
+}
+
+module.exports = { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments, insertComment, updateArticleVotes, removeComment }
