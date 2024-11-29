@@ -18,7 +18,20 @@ function fetchArticle(article_id) {
         })
 }
 
-function fetchArticles() {
+function fetchArticles(sort_by, order) {
+    const validSortBys = [
+        'article_id',
+         'title', 
+         'topic', 
+         'author', 
+         'created_at', 
+         'votes', 
+         'comment_count'];
+  const validOrders = ['asc', 'desc'];
+
+  if (!validSortBys.includes(sort_by) || !validOrders.includes(order)) {
+    return Promise.reject({ status: 400, msg: 'Invalid query' });
+  }
     return db.query(`
         SELECT articles.article_id, articles.title, articles.topic, articles.author,
         articles.created_at, articles.votes, articles.article_img_url,
@@ -27,7 +40,7 @@ function fetchArticles() {
       LEFT JOIN comments
       ON articles.article_id = comments.article_id
       GROUP BY articles.article_id
-      ORDER BY articles.created_at DESC;
+      ORDER BY ${sort_by} ${order.toUpperCase()};
       `)
         .then(({ rows }) => {
             return rows

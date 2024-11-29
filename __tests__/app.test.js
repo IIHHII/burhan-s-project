@@ -60,7 +60,7 @@ describe("GET /api/articles/:article_id", () => {
         })
       });
   });
-  test('GET:404 sends an appropriate status and error meaasge when given a valid bot non-existent id', () => {
+  test('404: sends an appropriate status and error meaasge when given a valid bot non-existent id', () => {
     return request(app)
       .get('/api/articles/123')
       .expect(404)
@@ -104,6 +104,31 @@ describe("GET /api/articles", () => {
       .expect(404)
       .then((response) => {
         expect(response.body.msg).toBe('Route not found');
+      });
+  });
+  test('200: Sorts articles by the "votes" column in ascending order when specified', () => {
+    return request(app)
+      .get('/api/articles?sort_by=votes&order=asc')
+      .then((response) => {
+        expect(response.status).toBe(200);
+        expect(response.body.articles).toBeSortedBy('votes', { ascending: true });
+      });
+  });
+  test('400: Responds with an error when an invalid sort_by column is provided', () => {
+    return request(app)
+      .get('/api/articles?sort_by=invalid_column')
+      .then((response) => {
+        expect(response.status).toBe(400);
+        expect(response.body.msg).toBe('Invalid query');
+      });
+  });
+
+  test('400: Responds with an error when an invalid order value is provided', () => {
+    return request(app)
+      .get('/api/articles?sort_by=votes&order=random')
+      .then((response) => {
+        expect(response.status).toBe(400);
+        expect(response.body.msg).toBe('Invalid query');
       });
   });
 })
@@ -258,5 +283,4 @@ describe("GET /api/users", () => {
       });
   });
 })
-
 
