@@ -222,7 +222,7 @@ describe('PATCH /api/articles/:article_id', () => {
 });
 
 describe('DELETE: /api/comments/:comment_id', () => {
-  test('DELETE:204 deletes the specified comment and sends no body back', () => {
+  test('204 deletes the specified comment and sends no body back', () => {
     return request(app).delete('/api/comments/3').expect(204);
   });
   test('404: responds with an appropriate error for non-existent comment ID', () => {
@@ -234,3 +234,29 @@ describe('DELETE: /api/comments/:comment_id', () => {
       });
   });
 });
+
+describe("GET /api/users", () => {
+  test("200: Responds with an object of all the users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users).toHaveLength(4);
+        body.users.forEach(({ username, name, avatar_url }) => {
+          expect(typeof username).toBe("string");
+          expect(typeof name).toBe("string");
+          expect(typeof avatar_url).toBe("string");
+        })
+      });
+  });
+  test('404: Responds with an error message if no users are found', () => {
+    return request(app)
+      .get('/api/banana')
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe('Route not found');
+      });
+  });
+})
+
+
