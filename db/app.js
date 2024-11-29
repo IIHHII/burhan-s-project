@@ -9,7 +9,8 @@ const {
     getArticleComments,
     postComment, 
     patchArticle,
-    deleteComment } = require("./controller")
+    deleteComment,
+    getUsers } = require("./controller")
 app.get('/api', apiHealthCheck)
 
 app.get('/api/topics', getTopics)
@@ -25,6 +26,8 @@ app.post('/api/articles/:article_id/comments', postComment)
 app.patch('/api/articles/:article_id', patchArticle)
 
 app.delete('/api/comments/:comment_id', deleteComment);
+
+app.get('/api/users', getUsers)
 
 app.all('*', (req, res, next) => {
     res.status(404).send({ msg: 'Route not found' });

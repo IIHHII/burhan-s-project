@@ -1,5 +1,5 @@
 const endpoints = require('../endpoints.json');
-const { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments, insertComment, updateArticleVotes, removeComment } = require('./model')
+const { fetchTopics, fetchArticle, fetchArticles, fetchArticleComments, insertComment, updateArticleVotes, removeComment, fetchUsers } = require('./model')
 
 exports.apiHealthCheck = (req, res) => {
     res.status(200).send({ endpoints })
@@ -83,4 +83,12 @@ exports.deleteComment = (req, res, next) => {
             }
             res.status(204).send();
         });
+}
+
+exports.getUsers = (req, res, next) => {
+    fetchUsers()
+    .then((users) => {
+        res.status(200).send({ users })
+    })
+    .catch(next)
 }
