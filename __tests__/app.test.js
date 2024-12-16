@@ -274,7 +274,7 @@ describe("GET /api/users", () => {
         })
       });
   });
-  test('404: Responds with an error message if no users are found', () => {
+  test('404: Responds with an error message if given an invalid route', () => {
     return request(app)
       .get('/api/banana')
       .expect(404)
